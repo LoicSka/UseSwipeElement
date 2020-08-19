@@ -1,18 +1,12 @@
-import { useEffect, useRef } from "react";
+import {useEffect} from "react";
 
-export default (callback, element) => {
-  const savedCallback = useRef(() => {});
-
-  // Remember the latest callback.
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
-
+export default(callback, element) => {
   useEffect(() => {
     if (element !== null) {
-      new SwipeContent(element);
+      const swipeContent = new SwipeContent(element);
+      element.addEventListener('swipeLeft', () => callback(swipeContent));
     }
-  }, [element]);
+  }, [element, callback]);
 };
 
 const SwipeContent = function (element) {
@@ -21,21 +15,34 @@ const SwipeContent = function (element) {
   this.dragging = false;
   this.intervalId = false;
   initSwipeContent(this);
-  console.log("HEYYY", this);
 };
 
 function initSwipeContent(content) {
-  content.element.addEventListener("mousedown", handleEvent.bind(content));
-  content.element.addEventListener("touchstart", handleEvent.bind(content));
+  content
+    .element
+    .addEventListener("mousedown", handleEvent.bind(content));
+  content
+    .element
+    .addEventListener("touchstart", handleEvent.bind(content));
 }
 
 function initDragging(content) {
   //add event listeners
-  content.element.addEventListener("mousemove", handleEvent.bind(content));
-  content.element.addEventListener("touchmove", handleEvent.bind(content));
-  content.element.addEventListener("mouseup", handleEvent.bind(content));
-  content.element.addEventListener("mouseleave", handleEvent.bind(content));
-  content.element.addEventListener("touchend", handleEvent.bind(content));
+  content
+    .element
+    .addEventListener("mousemove", handleEvent.bind(content));
+  content
+    .element
+    .addEventListener("touchmove", handleEvent.bind(content));
+  content
+    .element
+    .addEventListener("mouseup", handleEvent.bind(content));
+  content
+    .element
+    .addEventListener("mouseleave", handleEvent.bind(content));
+  content
+    .element
+    .addEventListener("touchend", handleEvent.bind(content));
 }
 
 function cancelDragging(content) {
@@ -46,15 +53,24 @@ function cancelDragging(content) {
       : window.cancelAnimationFrame(content.intervalId);
     content.intervalId = false;
   }
-  content.element.removeEventListener("mousemove", handleEvent.bind(content));
-  content.element.removeEventListener("touchmove", handleEvent.bind(content));
-  content.element.removeEventListener("mouseup", handleEvent.bind(content));
-  content.element.removeEventListener("mouseleave", handleEvent.bind(content));
-  content.element.removeEventListener("touchend", handleEvent.bind(content));
+  content
+    .element
+    .removeEventListener("mousemove", handleEvent.bind(content));
+  content
+    .element
+    .removeEventListener("touchmove", handleEvent.bind(content));
+  content
+    .element
+    .removeEventListener("mouseup", handleEvent.bind(content));
+  content
+    .element
+    .removeEventListener("mouseleave", handleEvent.bind(content));
+  content
+    .element
+    .removeEventListener("touchend", handleEvent.bind(content));
 }
 
 function handleEvent(event) {
-  console.log("HEYYY", this);
   switch (event.type) {
     case "mousedown":
     case "touchstart":
@@ -75,8 +91,6 @@ function handleEvent(event) {
 }
 
 function startDrag(content, event) {
-  console.log("HEYYY", content);
-  console.table(content);
   content.dragging = true;
   // listen to drag movements
   initDragging(content);
@@ -119,20 +133,22 @@ function endDrag(content, event) {
 }
 
 function drag(content, event) {
-  if (!content.dragging) return;
+  if (!content.dragging) 
+    return;
+  
   // emit dragging event with coordinates
   !window.requestAnimationFrame
     ? (content.intervalId = setTimeout(function () {
-        emitDrag.bind(content, event);
-      }, 250))
-    : (content.intervalId = window.requestAnimationFrame(
-        emitDrag.bind(content, event)
-      ));
+      emitDrag.bind(content, event);
+    }, 250))
+    : (content.intervalId = window.requestAnimationFrame(emitDrag.bind(content, event)));
 }
 
 function unify(event) {
   // unify mouse and touch events
-  return event.changedTouches ? event.changedTouches[0] : event;
+  return event.changedTouches
+    ? event.changedTouches[0]
+    : event;
 }
 
 function emitDrag(event) {
@@ -144,7 +160,7 @@ function emitDrag(event) {
 
 function getSign(x) {
   if (!Math.sign) {
-    return (x > 0) - (x < 0) || +x;
+    return (x > 0) - (x < 0) || + x;
   } else {
     return Math.sign(x);
   }
@@ -152,10 +168,18 @@ function getSign(x) {
 
 function emitSwipeEvents(content, eventName, detail, el) {
   var trigger = false;
-  if (el) trigger = el;
+  if (el) 
+    trigger = el;
+  
   // emit event with coordinates
   var event = new CustomEvent(eventName, {
-    detail: { x: detail[0], y: detail[1], origin: trigger }
+    detail: {
+      x: detail[0],
+      y: detail[1],
+      origin: trigger
+    }
   });
-  content.element.dispatchEvent(event);
+  content
+    .element
+    .dispatchEvent(event);
 }
